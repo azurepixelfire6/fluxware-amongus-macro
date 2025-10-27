@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Fluxware Among Us Macro</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=" />
+    <style>
+        /* iOS Dark Theme & Fullscreen */
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { height:100%; overflow:hidden; background:#000; color:#fff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:20px; -webkit-user-select:none; user-select:none; }
+        @media (prefers-color-scheme: dark) { body { background:#000; color:#fff; } }
+
+        /* Logo Styling */
+        .logo-container {
+            width:140px; height:140px; margin:40px auto 30px; background:#000; display:flex; align-items:center; justify-content:center;
+            border-radius:28px; box-shadow:0 8px 32px rgba(0,0,0,0.6); overflow:hidden;
+        }
+        .logo {
+            width:100px; height:100px; background:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=') center/contain no-repeat;
+        }
+
+        /* Title */
+        h1 {
+            font-size:28px; font-weight:800; letter-spacing:-0.5px; text-align:center; margin-bottom:8px;
+            background:linear-gradient(135deg, #00ff9d, #00b8ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        p.subtitle {
+            font-size:14px; color:#aaa; text-align:center; margin-bottom:30px; font-weight:500;
+        }
+
+        /* Macro Buttons Grid */
+        .macro-grid {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; max-width:400px; margin-bottom:30px;
+        }
+        .macro-btn {
+            background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px;
+            color:#fff; font-size:15px; font-weight:600; padding:16px 8px; text-align:center; transition:all 0.2s ease;
+            backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+        }
+        .macro-btn:active {
+            transform:scale(0.95); background:rgba(0,200,255,0.3); border-color:#00c8ff;
+        }
+        .macro-btn.emergency { background:rgba(255,50,50,0.15); border-color:rgba(255,80,80,0.4); }
+        .macro-btn.emergency:active { background:rgba(255,50,50,0.4); }
+
+        /* Status Bar */
+        .status {
+            position:fixed; bottom:20px; left:0; right:0; text-align:center; font-size:13px; color:#00ff9d; opacity:0; transition:opacity 0.3s;
+        }
+        .status.show { opacity:1; }
+
+        /* Add to Home Screen Prompt */
+        .homescreen {
+            position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.9); padding:16px; text-align:center;
+            font-size:14px; color:#fff; border-top:1px solid rgba(255,255,255,0.1); display:none;
+        }
+        .homescreen.show { display:block; animation:slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+
+        /* Touch Feedback */
+        .ripple {
+            position:absolute; border-radius:50%; background:rgba(0,200,255,0.4); transform:scale(0); animation:ripple 0.6s linear; pointer-events:none;
+        }
+        @keyframes ripple { to { transform:scale(4); opacity:0; } }
+
+        /* iOS Safe Area */
+        @supports(padding:max(0px)) {
+            body { padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); padding-bottom:env(safe-area-inset-bottom); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo -->
+    <div class="logo-container">
+        <div class="logo"></div>
+    </div>
+
+    <!-- Title -->
+    <h1>Fluxware</h1>
+    <p class="subtitle">Among Us Macro Tool • iOS Optimized</p>
+
+    <!-- Macro Grid -->
+    <div class="macro-grid" id="macroGrid">
+        <button class="macro-btn" data-action="report">Report Body</button>
+        <button class="macro-btn" data-action="vent">Vent Kill</button>
+        <button class="macro-btn" data-action="sabo">Sabotage O2</button>
+        <button class="macro-btn" data-action="task">Fake Task</button>
+        <button class="macro-btn emergency" data-action="emergency">Emergency!</button>
+        <button class="macro-btn" data-action="chat">Where?</button>
+        <button class="macro-btn" data-action="sus">Sus on Red</button>
+        <button class="macro-btn" data-action="vote">Vote Skip</button>
+        <button class="macro-btn" data-action="clear">Clear Chat</button>
+    </div>
+
+    <!-- Status -->
+    <div class="status" id="status"></div>
+
+    <!-- Add to Home Screen -->
+    <div class="homescreen" id="homescreen">
+        Tap <strong>Share → Add to Home Screen</strong> for full iOS experience
+    </div>
+
+    <script>
+        // Embedded Logo as SVG (exact match to uploaded file)
+        const logoSVG = `PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=`;
+
+        // Predefined quick chat macros (Among Us style)
+        const macros = {
+            "report": "Dead body reported in Medbay!",
+            "vent": "[Vent Kill] → Target eliminated silently.",
+            "sabo": "Sabotage O2 → Crew distracted!",
+            "task": "[Fake Task] Scanning... Done.",
+            "emergency": "🚨 EMERGENCY MEETING! 🚨",
+            "chat": "Where?",
+            "sus": "Red sus. Acting weird in Electrical.",
+            "vote": "Voting to skip.",
+            "clear": ""
+        };
+
+        // Status handler
+        const status = document.getElementById('status');
+        function showStatus(text, duration = 1500) {
+            status.textContent = text;
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), duration);
+        }
+
+        // Ripple effect
+        function createRipple(e) {
+            const btn = e.currentTarget;
+            const ripple = document.createElement('span');
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // Clipboard copy with fallback
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                // Fallback for older iOS
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // Macro button handler
+        document.querySelectorAll('.macro-btn').forEach(btn => {
+            btn.addEventListener('touchstart', createRipple, { passive: true });
+            btn.addEventListener('click', async () => {
+                const action = btn.dataset.action;
+                const text = macros[action] || '';
+                if (text) {
+                    await copyToClipboard(text);
+                    showStatus('Copied: ' + (text.length > 20 ? text.substring(0,20)+'...' : text));
+                } else if (action === 'clear') {
+                    await copyToClipboard('');
+                    showStatus('Chat cleared');
+                }
+            });
+        });
+
+        // Show Add to Home Screen on iOS (non-PWA detect)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isInStandaloneMode = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+        if (isIOS && !isInStandaloneMode) {
+            setTimeout(() => document.getElementById('homescreen').classList.add('show'), 2000);
+        }
+
+        // Prevent zoom on double tap
+        let lastTouch = 0;
+        document.addEventListener('touchend', e => {
+            const now = Date.now();
+            if (now - lastTouch <= 300) e.preventDefault();
+            lastTouch = now;
+        }, { passive: false });
+
+        // Full iOS immersion
+        if ('visualViewport' in window) {
+            window.visualViewport.addEventListener('resize', () => {
+                document.body.style.height = window.visualViewport.height + 'px';
+            });
+        }
+    </script>
+</body>
+</html>
