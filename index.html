@@ -37,9 +37,19 @@
         .section { display:none; width:100%; max-width:400px; }
         .section.active { display:block; }
 
+        /* Voice Button */
+        .voice-btn {
+            width:70px; height:70px; background:#00c8ff; border-radius:50%; margin:20px auto;
+            display:flex; align-items:center; justify-content:center; font-size:32px; color:#000; font-weight:900;
+            box-shadow:0 8px 24px rgba(0,200,255,0.4); transition:all 0.2s;
+        }
+        .voice-btn:active { transform:scale(0.92); }
+        .voice-btn.listening { background:#ff3b30; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.15); } }
+
         /* Overlay Canvas */
         #overlay {
-            position:fixed; top:0; left:0; width 文件:100%; height:100%; pointer-events:none; z-index:9999; opacity:0.6;
+            position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; opacity:0.6;
             background:transparent; display:none;
         }
         #overlay.active { display:block; }
@@ -157,21 +167,34 @@
 
     <!-- Title -->
     <h1>Fluxware</h1>
-    <p class="subtitle">Among Us Macro + Screen Control • iOS Pro</p>
+    <p class="subtitle" id="subtitle">Among Us Macro + Voice + Control • iOS Pro</p>
 
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" data-tab="control">Control</div>
+        <div class="tab active" data-tab="voice">Voice</div>
+        <div class="tab" data-tab="control">Control</div>
         <div class="tab" data-tab="chat">Chat</div>
         <div class="tab" data-tab="tasks">Tasks</div>
         <div class="tab" data-tab="timer">Timer</div>
+    </div>
+
+    <!-- Voice Tab -->
+    <div class="section active" id="voice">
+        <button class="voice-btn" id="voiceBtn">🎤</button>
+        <p style="text-align:center; font-size:14px; color:#aaa; margin:16px 0;">
+            Hold to speak • Say: "Report", "Kill", "Vent", "Emergency", etc.
+        </p>
+        <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:12px; margin:16px 0; font-size:13px; color:#ccc;">
+            <strong>Commands:</strong><br>
+            Report • Kill • Vent • Use • Sabotage • Emergency • Where • Sus Red • Skip • Fake Task • Timer Start
+        </div>
     </div>
 
     <!-- Overlay (Visual Feedback) -->
     <canvas id="overlay"></canvas>
 
     <!-- Control Tab -->
-    <div class="section active" id="control">
+    <div class=" ribad section" id="control">
         <div class="control-grid">
             <button class="ctrl-btn" data-action="tap" data-x="50" data-y="30">Report</button>
             <button class="ctrl-btn" data-action="tap" data-x="50" data-y="70">Use</button>
@@ -321,23 +344,103 @@
             setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 800);
         }
 
+        // === VOICE RECOGNITION ===
+        const voiceBtn = document.getElementById('voiceBtn');
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        let isListening = false;
+
+        voiceBtn.addEventListener('touchstart', e => {
+            e.preventDefault();
+            if (!isListening) {
+                recognition.start();
+                voiceBtn.classList.add('listening');
+                voiceBtn.textContent = '🔴';
+                showStatus('Listening...');
+                isListening = true;
+            }
+        });
+
+        voiceBtn.addEventListener('touchend', e => {
+            e.preventDefault();
+            if (isListening) {
+                recognition.stop();
+            }
+        });
+
+        recognition.onresult = event => {
+            const command = event.results[0][0].transcript.trim().toLowerCase();
+            handleVoiceCommand(command);
+        };
+
+        recognition.onend = () => {
+            voiceBtn.classList.remove('listening');
+            voiceBtn.textContent = '🎤';
+            isListening = false;
+        };
+
+        recognition.onerror = () => {
+            showStatus('Voice error — try again');
+            voiceBtn.classList.remove('listening');
+            voiceBtn.textContent = '🎤';
+            isListening = false;
+        };
+
+        // === Voice Commands Mapping ===
+        function handleVoiceCommand(cmd) {
+            showStatus(`Heard: "${cmd}"`);
+            const lower = cmd;
+
+            // Control Actions
+            if (lower.includes('report')) { triggerControl('tap', 50, 30); }
+            else if (lower.includes('use')) { triggerControl('tap', 50, 70); }
+            else if (lower.includes('kill')) { triggerControl('tap', 20, 85); }
+            else if (lower.includes('vent')) { triggerControl('tap', 80, 85); }
+            else if (lower.includes('map')) { triggerControl('tap', 10, 10); }
+            else if (lower.includes('swipe up')) { triggerControl('swipe', null, null, 'up'); }
+            else if (lower.includes('swipe down')) { triggerControl('swipe', null, null, 'down'); }
+
+            // Chat Macros
+            else if (lower.includes('emergency')) { triggerChat('EMERGENCY MEETING!'); }
+            else if (lower.includes('where')) { triggerChat('Where?'); }
+            else if (lower.includes('sus red') || lower.includes('red sus')) { triggerChat('Red sus in Electrical'); }
+            else if (lower.includes('skip')) { triggerChat('Skip vote'); }
+            else if (lower.includes('fake task')) { triggerChat('Scanning...'); }
+
+            // Timer
+            else if (lower.includes('timer start') || lower.includes('start timer')) { document.getElementById('timerStart').click(); }
+            else if (lower.includes('pause')) { document.getElementById('timerPause').click(); }
+            else if (lower.includes('reset')) { document.getElementById('timerReset').click(); }
+
+            else { showStatus('Unknown command'); }
+        }
+
+        function triggerControl(action, x, y, dir) {
+            if (action === 'tap') drawTap(x, y);
+            else if (action === 'swipe') drawSwipe(dir);
+            showStatus(`${action} ${dir || `@${x}%,${y}%`}`);
+        }
+
+        function triggerChat(msg) {
+            const color = document.querySelector('.color-swatch.selected')?.dataset.color || 'White';
+            const final = `${color}: ${msg}`;
+            copyToClipboard(final);
+            showStatus(`Said: ${final.substring(0,25)}...`);
+        }
+
         // === Control Actions ===
         document.querySelectorAll('.ctrl-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const action = btn.dataset.action;
                 const x = parseFloat(btn.dataset.x) || 50;
                 const y = parseFloat(btn.dataset.y) || 50;
-                if (action === 'tap') {
-                    drawTap(x, y);
-                    showStatus(`Tap at ${x}%, ${y}%`);
-                } else if (action === 'hold') {
-                    drawTap(x, y);
-                    showStatus(`Hold at ${x}%, ${y}% (1.5s)`);
-                } else if (action === 'swipe') {
-                    const dir = btn.dataset.dir;
-                    drawSwipe(dir);
-                    showStatus(`Swipe ${dir}`);
-                }
+                const dir = btn.dataset.dir;
+                if (action === 'tap' || action === 'hold') drawTap(x, y);
+                else if (action === 'swipe') drawSwipe(dir);
+                showStatus(`${action} ${dir || `@${x}%,${y}%`}`);
             });
             btn.addEventListener('touchstart', ripple, {passive:true});
         });
@@ -346,25 +449,21 @@
         const joy = document.getElementById('joystick');
         const stick = document.getElementById('stick');
         let joyActive = false;
-        let startX, startY;
 
         joy.addEventListener('touchstart', e => {
             joyActive = true;
-            const touch = e.touches[0];
-            startX = touch.clientX;
-            startY = touch.clientY;
             e.preventDefault();
         }, {passive:false});
 
         joy.addEventListener('touchmove', e => {
             if (!joyActive) return;
             const touch = e.touches[0];
-            const dx = touch.clientX - joy.getBoundingClientRect().left - 60;
-            const dy = touch.clientY - joy.getBoundingClientRect().top - 60;
+            const rect = joy.getBoundingClientRect();
+            const dx = touch.clientX - rect.left - 60;
+            const dy = touch.clientY - rect.top - 60;
             const dist = Math.min(Math.hypot(dx, dy), 35);
             const angle = Math.atan2(dy, dx);
             stick.style.transform = `translate(${dist * Math.cos(angle)}px, ${dist * Math.sin(angle)}px)`;
-            showStatus(`Move: ${Math.round((dx/35)*100)}%, ${Math.round((dy/35)*100)}%`);
             e.preventDefault();
         }, {passive:false});
 
@@ -420,8 +519,6 @@
                 await copyToClipboard(final);
                 showStatus(`Sent: ${final.substring(0,25)}...`);
                 input.value = '';
-            } else {
-                showStatus('Type a message first');
             }
         });
 
