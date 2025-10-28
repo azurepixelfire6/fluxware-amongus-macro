@@ -7,7 +7,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#000000" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=" />
     <style>
         /* iOS Dark Theme & Fullscreen */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -15,192 +14,352 @@
         body { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:20px; -webkit-user-select:none; user-select:none; }
         @media (prefers-color-scheme: dark) { body { background:#000; color:#fff; } }
 
-        /* Logo Styling */
-        .logo-container {
-            width:140px; height:140px; margin:40px auto 30px; background:#000; display:flex; align-items:center; justify-content:center;
-            border-radius:28px; box-shadow:0 8px 32px rgba(0,0,0,0.6); overflow:hidden;
-        }
-        .logo {
-            width:100px; height:100px; background:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=') center/contain no-repeat;
-        }
-
         /* Title */
         h1 {
-            font-size:28px; font-weight:800; letter-spacing:-0.5px; text-align:center; margin-bottom:8px;
+            font-size:32px; font-weight:800; letter-spacing:-0.8px; text-align:center; margin:30px 0 6px;
             background:linear-gradient(135deg, #00ff9d, #00b8ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
         }
         p.subtitle {
-            font-size:14px; color:#aaa; text-align:center; margin-bottom:30px; font-weight:500;
+            font-size:15px; color:#aaa; text-align:center; margin-bottom:30px; font-weight:500;
         }
 
-        /* Macro Buttons Grid */
+        /* Tabs */
+        .tabs {
+            display:flex; width:100%; max-width:400px; background:rgba(255,255,255,0.05); border-radius:16px; padding:4px; margin-bottom:20px;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+        .tab {
+            flex:1; padding:10px; text-align:center; font-size:14px; font-weight:600; border-radius:12px; transition:all 0.2s;
+        }
+        .tab.active { background:rgba(0,200,255,0.3); color:#00e0ff; }
+
+        /* Sections */
+        .section { display:none; width:100%; max-width:400px; }
+        .section.active { display:block; }
+
+        /* Macro Grid */
         .macro-grid {
-            display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; max-width:400px; margin-bottom:30px;
+            display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px;
         }
         .macro-btn {
             background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px;
-            color:#fff; font-size:15px; font-weight:600; padding:16px 8px; text-align:center; transition:all 0.2s ease;
+            color:#fff; font-size:14px; font-weight:600; padding:14px 6px; text-align:center; transition:all 0.2s ease;
             backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
         }
-        .macro-btn:active {
-            transform:scale(0.95); background:rgba(0,200,255,0.3); border-color:#00c8ff;
-        }
+        .macro-btn:active { transform:scale(0.94); background:rgba(0,200,255,0.3); border-color:#00c8ff; }
         .macro-btn.emergency { background:rgba(255,50,50,0.15); border-color:rgba(255,80,80,0.4); }
         .macro-btn.emergency:active { background:rgba(255,50,50,0.4); }
 
-        /* Status Bar */
+        /* Custom Input */
+        .custom-input {
+            display:flex; margin-bottom:16px; gap:8px;
+        }
+        .custom-input input {
+            flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px;
+            padding:12px 14px; color:#fff; font-size:15px; outline:none;
+        }
+        .custom-input input::placeholder { color:#777; }
+        .custom-input button {
+            background:#00c8ff; color:#000; font-weight:700; border:none; border-radius:12px; padding:0 16px;
+            font-size:14px;
+        }
+        .custom-input button:active { background:#00a0d0; transform:scale(0.96); }
+
+        /* Color Picker */
+        .color-picker {
+            display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin:16px 0;
+        }
+        .color-swatch {
+            width:100%; aspect-ratio:1; border-radius:50%; border:2px solid rgba(255,255,255,0.2); cursor:pointer;
+            transition:transform 0.2s, border 0.2s;
+        }
+        .color-swatch:active { transform:scale(0.9); }
+        .color-swatch.selected { border:3px solid #00ff9d; transform:scale(1.1); }
+
+        /* Timer */
+        .timer-display {
+            font-size:36px; font-weight:800; text-align:center; margin:20px 0; color:#00ff9d;
+            font-variant-numeric:tabular-nums;
+        }
+        .timer-controls {
+            display:flex; justify-content:center; gap:12px;
+        }
+        .timer-btn {
+            background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:50%;
+            width:56px; height:56px; display:flex; align-items:center; justify-content:center; font-size:20px;
+        }
+        .timer-btn:active { background:rgba(0,200,255,0.3); }
+
+        /* Task Tracker */
+        .task-list {
+            background:rgba(255,255,255,0.05); border-radius:16px; padding:12px; margin:16px 0;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+        .task-item {
+            display:flex; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+            font-size:14px;
+        }
+        .task-item:last-child { border-bottom:none; }
+        .task-checkbox {
+            width:20px; height:20px; border:2px solid #555; border-radius:6px; margin-right:12px;
+            display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+        }
+        .task-checkbox.checked { background:#00ff9d; border-color:#00ff9d; }
+        .task-checkbox.checked::after { content:'✓'; color:#000; font-weight:900; font-size:12px; }
+
+        /* Status */
         .status {
             position:fixed; bottom:20px; left:0; right:0; text-align:center; font-size:13px; color:#00ff9d; opacity:0; transition:opacity 0.3s;
         }
         .status.show { opacity:1; }
 
-        /* Add to Home Screen Prompt */
-        .homescreen {
-            position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.9); padding:16px; text-align:center;
-            font-size:14px; color:#fff; border-top:1px solid rgba(255,255,255,0.1); display:none;
-        }
-        .homescreen.show { display:block; animation:slideUp 0.4s ease; }
-        @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-
-        /* Touch Feedback */
+        /* Ripple */
         .ripple {
             position:absolute; border-radius:50%; background:rgba(0,200,255,0.4); transform:scale(0); animation:ripple 0.6s linear; pointer-events:none;
         }
         @keyframes ripple { to { transform:scale(4); opacity:0; } }
 
-        /* iOS Safe Area */
+        /* Safe Area */
         @supports(padding:max(0px)) {
-            body { padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); padding-bottom:env(safe-area-inset-bottom); }
+            body { padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); padding-bottom:max(20px, env(safe-area-inset-bottom)); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Logo -->
-    <div class="logo-container">
-        <div class="logo"></div>
-    </div>
-
     <!-- Title -->
     <h1>Fluxware</h1>
-    <p class="subtitle">Among Us Macro Tool • iOS Optimized</p>
+    <p class="subtitle">Advanced Among Us Macro • iOS Pro</p>
 
-    <!-- Macro Grid -->
-    <div class="macro-grid" id="macroGrid">
-        <button class="macro-btn" data-action="report">Report Body</button>
-        <button class="macro-btn" data-action="vent">Vent Kill</button>
-        <button class="macro-btn" data-action="sabo">Sabotage O2</button>
-        <button class="macro-btn" data-action="task">Fake Task</button>
-        <button class="macro-btn emergency" data-action="emergency">Emergency!</button>
-        <button class="macro-btn" data-action="chat">Where?</button>
-        <button class="macro-btn" data-action="sus">Sus on Red</button>
-        <button class="macro-btn" data-action="vote">Vote Skip</button>
-        <button class="macro-btn" data-action="clear">Clear Chat</button>
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="chat">Chat</div>
+        <div class="tab" data-tab="tasks">Tasks</div>
+        <div class="tab" data-tab="timer">Timer</div>
+    </div>
+
+    <!-- Chat Tab -->
+    <div class="section active" id="chat">
+        <div class="custom-input">
+            <input type="text" id="customMsg" placeholder="Type custom message..." />
+            <button id="sendCustom">Send</button>
+        </div>
+        <div class="macro-grid">
+            <button class="macro-btn" data-msg="Dead body in Medbay!">Report</button>
+            <button class="macro-btn" data-msg="Vented into Admin">Vent</button>
+            <button class="macro-btn" data-msg="O2 sabotaged!">Sabo O2</button>
+            <button class="macro-btn" data-msg="Scanning...">Fake Task</button>
+            <button class="macro-btn emergency" data-msg="EMERGENCY MEETING!">Emergency</button>
+            <button class="macro-btn" data-msg="Where?">Where?</button>
+            <button class="macro-btn" data-msg="Red sus in Electrical">Sus Red</button>
+            <button class="macro-btn" data-msg="Skip vote">Skip</button>
+            <button class="macro-btn" data-msg="">Clear</button>
+        </div>
+        <div class="color-picker">
+            <div class="color-swatch" data-color="Red" style="background:#c93333;"></div>
+            <div class="color-swatch" data-color="Blue" style="background:#2d38c9;"></div>
+            <div class="color-swatch" data-color="Green" style="background:#1f8b3f;"></div>
+            <div class="color-swatch" data-color="Pink" style="background:#d56fb1;"></div>
+            <div class="color-swatch" data-color="Orange" style="background:#f27c2b;"></div>
+            <div class="color-swatch" data-color="Yellow" style="background:#f2d02b;"></div>
+            <div class="color-swatch" data-color="Black" style="background:#3a3a3a;"></div>
+            <div class="color-swatch" data-color="White" style="background:#e6e6e6;"></div>
+            <div class="color-swatch" data-color="Purple" style="background:#7c2bc9;"></div>
+            <div class="color-swatch" data-color="Brown" style="background:#8b4513;"></div>
+            <div class="color-swatch" data-color="Cyan" style="background:#00ffff;"></div>
+            <div class="color-swatch" data-color="Lime" style="background:#7fff00;"></div>
+        </div>
+    </div>
+
+    <!-- Tasks Tab -->
+    <div class="section" id="tasks">
+        <div class="task-list" id="taskList">
+            <div class="task-item"><div class="task-checkbox" data-task="0"></div> Swipe Card</div>
+            <div class="task-item"><div class="task-checkbox" data-task="1"></div> Fix Wiring</div>
+            <div class="task-item"><div class="task-checkbox" data-task="2"></div> Empty Garbage</div>
+            <div class="task-item"><div class="task-checkbox" data-task="3"></div> Prime Shields</div>
+            <div class="task-item"><div class="task-checkbox" data-task="4"></div> Upload Data</div>
+            <div class="task-item"><div class="task-checkbox" data-task="5"></div> Stabilize Steering</div>
+        </div>
+        <button class="macro-btn" style="width:100%; margin-top:12px;" id="fakeAll">Fake All Tasks</button>
+    </div>
+
+    <!-- Timer Tab -->
+    <div class="section" id="timer">
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <div class="timer-controls">
+            <button class="timer-btn" id="timerStart">▶</button>
+            <button class="timer-btn" id="timerPause">⏸</button>
+            <button class="timer-btn" id="timerReset">↺</button>
+        </div>
+        <div style="margin-top:20px; text-align:center; font-size:13px; color:#777;">
+            Kill Cooldown • Emergency Timer • Sabotage
+        </div>
     </div>
 
     <!-- Status -->
     <div class="status" id="status"></div>
 
-    <!-- Add to Home Screen -->
-    <div class="homescreen" id="homescreen">
-        Tap <strong>Share → Add to Home Screen</strong> for full iOS experience
-    </div>
-
     <script>
-        // Embedded Logo as SVG (exact match to uploaded file)
-        const logoSVG = `PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=`;
-
-        // Predefined quick chat macros (Among Us style)
-        const macros = {
-            "report": "Dead body reported in Medbay!",
-            "vent": "[Vent Kill] → Target eliminated silently.",
-            "sabo": "Sabotage O2 → Crew distracted!",
-            "task": "[Fake Task] Scanning... Done.",
-            "emergency": "🚨 EMERGENCY MEETING! 🚨",
-            "chat": "Where?",
-            "sus": "Red sus. Acting weird in Electrical.",
-            "vote": "Voting to skip.",
-            "clear": ""
-        };
-
-        // Status handler
-        const status = document.getElementById('status');
-        function showStatus(text, duration = 1500) {
-            status.textContent = text;
-            status.classList.add('show');
-            setTimeout(() => status.classList.remove('show'), duration);
-        }
-
-        // Ripple effect
-        function createRipple(e) {
-            const btn = e.currentTarget;
-            const ripple = document.createElement('span');
-            const rect = btn.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            ripple.className = 'ripple';
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            btn.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 600);
-        }
-
-        // Clipboard copy with fallback
+        // === CORE: Clipboard with iOS fallback ===
         async function copyToClipboard(text) {
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(text);
             } else {
-                // Fallback for older iOS
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
+                const el = document.createElement('textarea');
+                el.value = text;
+                el.style.position = 'fixed'; el.style.opacity = '0';
+                document.body.appendChild(el);
+                el.select();
                 document.execCommand('copy');
-                document.body.removeChild(textarea);
+                document.body.removeChild(el);
             }
         }
 
-        // Macro button handler
-        document.querySelectorAll('.macro-btn').forEach(btn => {
-            btn.addEventListener('touchstart', createRipple, { passive: true });
-            btn.addEventListener('click', async () => {
-                const action = btn.dataset.action;
-                const text = macros[action] || '';
-                if (text) {
-                    await copyToClipboard(text);
-                    showStatus('Copied: ' + (text.length > 20 ? text.substring(0,20)+'...' : text));
-                } else if (action === 'clear') {
-                    await copyToClipboard('');
-                    showStatus('Chat cleared');
-                }
+        // === Status ===
+        const status = document.getElementById('status');
+        function showStatus(msg, time = 1500) {
+            status.textContent = msg;
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), time);
+        }
+
+        // === Ripple ===
+        function ripple(e) {
+            const btn = e.currentTarget;
+            const r = document.createElement('span');
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.touches ? e.touches[0].clientX - rect.left - size/2 : e.clientX - rect.left - size/2;
+            const y = e.touches ? e.touches[0].clientY - rect.top - size/2 : e.clientY - rect.top - size/2;
+            r.className = 'ripple';
+            r.style.width = r.style.height = size + 'px';
+            r.style.left = x + 'px';
+            r.style.top = y + 'px';
+            btn.appendChild(r);
+            setTimeout(() => r.remove(), 600);
+        }
+
+        // === Tabs ===
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
 
-        // Show Add to Home Screen on iOS (non-PWA detect)
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isInStandaloneMode = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-        if (isIOS && !isInStandaloneMode) {
-            setTimeout(() => document.getElementById('homescreen').classList.add('show'), 2000);
+        // === CHAT TAB ===
+        let selectedColor = 'White';
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                swatch.classList.add('selected');
+                selectedColor = swatch.dataset.color;
+                showStatus(`Color: ${selectedColor}`);
+            });
+            swatch.addEventListener('touchstart', ripple, {passive:true});
+        });
+
+        // Predefined macros
+        document.querySelectorAll('.macro-btn[data-msg]').forEach(btn => {
+            btn.addEventListener('touchstart', ripple, {passive:true});
+            btn.addEventListener('click', async () => {
+                const msg = btn.dataset.msg;
+                const final = msg ? `${selectedColor}: ${msg}` : '';
+                await copyToClipboard(final);
+                showStatus(final ? `Copied: ${final.substring(0,25)}...` : 'Chat cleared');
+            });
+        });
+
+        // Custom message
+        document.getElementById('sendCustom').addEventListener('click', async () => {
+            const input = document.getElementById('customMsg');
+            const msg = input.value.trim();
+            if (msg) {
+                const final = `${selectedColor}: ${msg}`;
+                await copyToClipboard(final);
+                showStatus(`Sent: ${final.substring(0,25)}...`);
+                input.value = '';
+            } else {
+                showStatus('Type a message first');
+            }
+        });
+
+        // === TASKS TAB ===
+        document.querySelectorAll('.task-checkbox').forEach(cb => {
+            cb.addEventListener('click', () => {
+                cb.classList.toggle('checked');
+                const checked = document.querySelectorAll('.task-checkbox.checked').length;
+                const total = document.querySelectorAll('.task-checkbox').length;
+                showStatus(`Tasks: ${checked}/${total}`);
+            });
+        });
+
+        document.getElementById('fakeAll').addEventListener('click', async () => {
+            document.querySelectorAll('.task-checkbox').forEach(cb => cb.classList.add('checked'));
+            await copyToClipboard('All tasks completed.');
+            showStatus('Faked all tasks!');
+        });
+
+        // === TIMER TAB ===
+        let timerInterval, seconds = 0;
+        const display = document.getElementById('timerDisplay');
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const sec = (s % 60).toString().padStart(2, '0');
+            return `${m}:${sec}`;
         }
 
-        // Prevent zoom on double tap
+        document.getElementById('timerStart').addEventListener('click', () => {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    display.textContent = formatTime(seconds);
+                }, 1000);
+                showStatus('Timer started');
+            }
+        });
+
+        document.getElementById('timerPause').addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showStatus('Timer paused');
+        });
+
+        document.getElementById('timerReset').addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            seconds = 0;
+            display.textContent = '00:00';
+            showStatus('Timer reset');
+        });
+
+        // === iOS Optimizations ===
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        if (isIOS && !window.navigator.standalone) {
+            setTimeout(() => {
+                const banner = document.createElement('div');
+                banner.style.cssText = 'position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.9); padding:16px; text-align:center; font-size:14px; color:#fff; border-top:1px solid rgba(255,255,255,0.1);';
+                banner.innerHTML = 'Tap <strong>Share → Add to Home Screen</strong> for best experience';
+                document.body.appendChild(banner);
+            }, 2500);
+        }
+
+        // Prevent double-tap zoom
         let lastTouch = 0;
         document.addEventListener('touchend', e => {
             const now = Date.now();
             if (now - lastTouch <= 300) e.preventDefault();
             lastTouch = now;
-        }, { passive: false });
+        }, {passive:false});
 
-        // Full iOS immersion
-        if ('visualViewport' in window) {
-            window.visualViewport.addEventListener('resize', () => {
-                document.body.style.height = window.visualViewport.height + 'px';
-            });
-        }
+        // All buttons ripple
+        document.querySelectorAll('button').forEach(b => {
+            b.addEventListener('touchstart', ripple, {passive:true});
+        });
     </script>
 </body>
 </html>
