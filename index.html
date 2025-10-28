@@ -37,6 +37,34 @@
         .section { display:none; width:100%; max-width:400px; }
         .section.active { display:block; }
 
+        /* Overlay Canvas */
+        #overlay {
+            position:fixed; top:0; left:0; width 文件:100%; height:100%; pointer-events:none; z-index:9999; opacity:0.6;
+            background:transparent; display:none;
+        }
+        #overlay.active { display:block; }
+
+        /* Control Grid */
+        .control-grid {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:20px 0;
+        }
+        .ctrl-btn {
+            background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:20px;
+            color:#fff; font-size:13px; font-weight:600; padding:18px 8px; text-align:center; transition:all 0.2s;
+            backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+        }
+        .ctrl-btn:active { transform:scale(0.92); background:rgba(0,200,255,0.4); }
+
+        /* Joystick */
+        .joystick {
+            width:120px; height:120px; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.3);
+            border-radius:50%; position:relative; margin:20px auto;
+        }
+        .stick {
+            width:50px; height:50px; background:#00c8ff; border-radius:50%; position:absolute; left:50%; top:50%;
+            transform:translate(-50%,-50%); transition:transform 0.05s;
+        }
+
         /* Macro Grid */
         .macro-grid {
             display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px;
@@ -129,17 +157,40 @@
 
     <!-- Title -->
     <h1>Fluxware</h1>
-    <p class="subtitle">Advanced Among Us Macro • iOS Pro</p>
+    <p class="subtitle">Among Us Macro + Screen Control • iOS Pro</p>
 
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" data-tab="chat">Chat</div>
+        <div class="tab active" data-tab="control">Control</div>
+        <div class="tab" data-tab="chat">Chat</div>
         <div class="tab" data-tab="tasks">Tasks</div>
         <div class="tab" data-tab="timer">Timer</div>
     </div>
 
+    <!-- Overlay (Visual Feedback) -->
+    <canvas id="overlay"></canvas>
+
+    <!-- Control Tab -->
+    <div class="section active" id="control">
+        <div class="control-grid">
+            <button class="ctrl-btn" data-action="tap" data-x="50" data-y="30">Report</button>
+            <button class="ctrl-btn" data-action="tap" data-x="50" data-y="70">Use</button>
+            <button class="ctrl-btn" data-action="tap" data-x="20" data-y="85">Kill</button>
+            <button class="ctrl-btn" data-action="tap" data-x="80" data-y="85">Vent</button>
+            <button class="ctrl-btn" data-action="tap" data-x="50" data-y="50">Tasks</button>
+            <button class="ctrl-btn" data-action="tap" data-x="10" data-y="10">Map</button>
+            <button class="ctrl-btn" data-action="hold" data-x="50" data-y="85">Hold Use</button>
+            <button class="ctrl-btn" data-action="swipe" data-dir="up">Swipe Up</button>
+            <button class="ctrl-btn" data-action="swipe" data-dir="down">Swipe Down</button>
+        </div>
+        <div class="joystick" id="joystick">
+            <div class="stick" id="stick"></div>
+        </div>
+        <button class="macro-btn" style="width:100%; margin-top:20px;" id="toggleOverlay">Toggle Overlay</button>
+    </div>
+
     <!-- Chat Tab -->
-    <div class="section active" id="chat">
+    <div class="section" id="chat">
         <div class="custom-input">
             <input type="text" id="customMsg" placeholder="Type custom message..." />
             <button id="sendCustom">Send</button>
@@ -201,7 +252,7 @@
     <div class="status" id="status"></div>
 
     <script>
-        // === CORE: Clipboard with iOS fallback ===
+        // === CORE: Clipboard ===
         async function copyToClipboard(text) {
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(text);
@@ -240,6 +291,95 @@
             setTimeout(() => r.remove(), 600);
         }
 
+        // === Overlay Canvas ===
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let overlayActive = false;
+
+        function drawTap(x, y) {
+            const px = (x / 100) * canvas.width;
+            const py = (y / 100) * canvas.height;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(px, py, 40, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 200, 255, 0.5)';
+            ctx.fill();
+            ctx.strokeStyle = '#00ff9d';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 600);
+        }
+
+        function drawSwipe(dir) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = 'bold 48px system-ui';
+            ctx.fillStyle = '#00ff9d';
+            ctx.textAlign = 'center';
+            ctx.fillText(dir === 'up' ? '↑' : '↓', canvas.width/2, canvas.height/2);
+            setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 800);
+        }
+
+        // === Control Actions ===
+        document.querySelectorAll('.ctrl-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                const x = parseFloat(btn.dataset.x) || 50;
+                const y = parseFloat(btn.dataset.y) || 50;
+                if (action === 'tap') {
+                    drawTap(x, y);
+                    showStatus(`Tap at ${x}%, ${y}%`);
+                } else if (action === 'hold') {
+                    drawTap(x, y);
+                    showStatus(`Hold at ${x}%, ${y}% (1.5s)`);
+                } else if (action === 'swipe') {
+                    const dir = btn.dataset.dir;
+                    drawSwipe(dir);
+                    showStatus(`Swipe ${dir}`);
+                }
+            });
+            btn.addEventListener('touchstart', ripple, {passive:true});
+        });
+
+        // === Joystick ===
+        const joy = document.getElementById('joystick');
+        const stick = document.getElementById('stick');
+        let joyActive = false;
+        let startX, startY;
+
+        joy.addEventListener('touchstart', e => {
+            joyActive = true;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            e.preventDefault();
+        }, {passive:false});
+
+        joy.addEventListener('touchmove', e => {
+            if (!joyActive) return;
+            const touch = e.touches[0];
+            const dx = touch.clientX - joy.getBoundingClientRect().left - 60;
+            const dy = touch.clientY - joy.getBoundingClientRect().top - 60;
+            const dist = Math.min(Math.hypot(dx, dy), 35);
+            const angle = Math.atan2(dy, dx);
+            stick.style.transform = `translate(${dist * Math.cos(angle)}px, ${dist * Math.sin(angle)}px)`;
+            showStatus(`Move: ${Math.round((dx/35)*100)}%, ${Math.round((dy/35)*100)}%`);
+            e.preventDefault();
+        }, {passive:false});
+
+        joy.addEventListener('touchend', () => {
+            joyActive = false;
+            stick.style.transform = 'translate(-50%, -50%)';
+        });
+
+        // === Overlay Toggle ===
+        document.getElementById('toggleOverlay').addEventListener('click', () => {
+            overlayActive = !overlayActive;
+            canvas.classList.toggle('active');
+            showStatus(overlayActive ? 'Overlay ON' : 'Overlay OFF');
+        });
+
         // === Tabs ===
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -262,7 +402,6 @@
             swatch.addEventListener('touchstart', ripple, {passive:true});
         });
 
-        // Predefined macros
         document.querySelectorAll('.macro-btn[data-msg]').forEach(btn => {
             btn.addEventListener('touchstart', ripple, {passive:true});
             btn.addEventListener('click', async () => {
@@ -273,7 +412,6 @@
             });
         });
 
-        // Custom message
         document.getElementById('sendCustom').addEventListener('click', async () => {
             const input = document.getElementById('customMsg');
             const msg = input.value.trim();
@@ -287,7 +425,7 @@
             }
         });
 
-        // === TASKS TAB ===
+        // === TASKS ===
         document.querySelectorAll('.task-checkbox').forEach(cb => {
             cb.addEventListener('click', () => {
                 cb.classList.toggle('checked');
@@ -303,7 +441,7 @@
             showStatus('Faked all tasks!');
         });
 
-        // === TIMER TAB ===
+        // === TIMER ===
         let timerInterval, seconds = 0;
         const display = document.getElementById('timerDisplay');
 
@@ -337,18 +475,17 @@
             showStatus('Timer reset');
         });
 
-        // === iOS Optimizations ===
+        // === iOS ===
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         if (isIOS && !window.navigator.standalone) {
             setTimeout(() => {
                 const banner = document.createElement('div');
                 banner.style.cssText = 'position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,0.9); padding:16px; text-align:center; font-size:14px; color:#fff; border-top:1px solid rgba(255,255,255,0.1);';
-                banner.innerHTML = 'Tap <strong>Share → Add to Home Screen</strong> for best experience';
+                banner.innerHTML = 'Tap <strong>Share → Add to Home Screen</strong>';
                 document.body.appendChild(banner);
             }, 2500);
         }
 
-        // Prevent double-tap zoom
         let lastTouch = 0;
         document.addEventListener('touchend', e => {
             const now = Date.now();
@@ -356,9 +493,13 @@
             lastTouch = now;
         }, {passive:false});
 
-        // All buttons ripple
         document.querySelectorAll('button').forEach(b => {
             b.addEventListener('touchstart', ripple, {passive:true});
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         });
     </script>
 </body>
