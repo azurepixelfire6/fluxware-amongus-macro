@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#000000" />
+    <meta name="apple-itunes-app" content="app-id=fluxware" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDI0IiBoZWlnaHQ9IjEwMjQiIGZpbGw9ImJsYWNrIi8+PHBhdGggZD0iTTAgMTAyNEg0MTZWMEgweiBNNDE2IDEwMjRINzY4VjBING16IE03NjggMTAyNEgxMDI0VjBIMTc2eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=" />
     <style>
         /* iOS Dark Theme & Fullscreen */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -16,7 +18,7 @@
 
         /* Title */
         h1 {
-            font-size:32px; font-weight:800; letter-spacing:-0.8px; text-align:center; margin:30px 0 6px;
+            font-size:32px; font  font-weight:800; letter-spacing:-0.8px; text-align:center; margin:30px 0 6px;
             background:linear-gradient(135deg, #00ff9d, #00b8ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
         }
         p.subtitle {
@@ -46,6 +48,35 @@
         .voice-btn:active { transform:scale(0.92); }
         .voice-btn.listening { background:#ff3b30; animation:pulse 1.5s infinite; }
         @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.15); } }
+
+        /* Siri Shortcuts */
+        .siri-section {
+            background:rgba(255,255,255,0.05); border-radius:16px; padding:16px; margin:16px 0;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+        .siri-btn {
+            background:rgba(0,200,255,0.2); color:#00e0ff; border:none; border-radius:12px; padding:12px 16px;
+            font-size:14px; font-weight:600; width:100%; margin:8px 0; text-align:center;
+        }
+        .siri-btn:active { background:rgba(0,200,255,0.4); }
+
+        /* Auto-Responder */
+        .auto-section {
+            background:rgba(255,255,255,0.05); border-radius:16px; padding:16px; margin:16px 0;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+        .auto-toggle {
+            display:flex; align-items:center; justify-content:space-between; padding:8px 0;
+            font-size:14px;
+        }
+        .switch {
+            width:44px; height:24px; background:#444; border-radius:12px; position:relative; cursor:pointer;
+            transition:background 0.2s;
+        }
+        .switch.active { background:#00c8ff; }
+        .switch::after { content:''; width:20px; height:20px; background:#fff; border-radius:50%;
+            position:absolute; left:2px; top:2px; transition:transform 0.2s; }
+        .switch.active::after { transform:translateX(20px); }
 
         /* Overlay Canvas */
         #overlay {
@@ -167,34 +198,53 @@
 
     <!-- Title -->
     <h1>Fluxware</h1>
-    <p class="subtitle" id="subtitle">Among Us Macro + Voice + Control • iOS Pro</p>
+    <p class="subtitle">Siri + Voice + Auto-Reply • iOS Pro</p>
 
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" data-tab="voice">Voice</div>
+        <div class="tab active" data-tab="siri">Siri</div>
+        <div class="tab" data-tab="voice">Voice</div>
         <div class="tab" data-tab="control">Control</div>
         <div class="tab" data-tab="chat">Chat</div>
         <div class="tab" data-tab="tasks">Tasks</div>
         <div class="tab" data-tab="timer">Timer</div>
     </div>
 
-    <!-- Voice Tab -->
-    <div class="section active" id="voice">
-        <button class="voice-btn" id="voiceBtn">🎤</button>
-        <p style="text-align:center; font-size:14px; color:#aaa; margin:16px 0;">
-            Hold to speak • Say: "Report", "Kill", "Vent", "Emergency", etc.
-        </p>
-        <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:12px; margin:16px 0; font-size:13px; color:#ccc;">
-            <strong>Commands:</strong><br>
-            Report • Kill • Vent • Use • Sabotage • Emergency • Where • Sus Red • Skip • Fake Task • Timer Start
+    <!-- Siri Tab -->
+    <div class="section active" id="siri">
+        <div class="siri-section">
+            <p style="font-size:14px; margin-bottom:12px;">Say to Siri:</p>
+            <button class="siri-btn" onclick="addSiriShortcut('report')">“Report body in Medbay”</button>
+            <button class="siri-btn" onclick="addSiriShortcut('emergency')">“Emergency meeting!”</button>
+            <button class="siri-btn" onclick="addSiriShortcut('kill')">“Kill target”</button>
+            <button class="siri-btn" onclick="addSiriShortcut('vent')">“Vent now”</button>
+            <button class="siri-btn" onclick="addSiriShortcut('where')">“Where?”</button>
+            <button class="siri-btn" onclick="addSiriShortcut('skip')">“Skip vote”</button>
+        </div>
+        <div class="auto-section">
+            <div class="auto-toggle">
+                <span>Auto-Responder</span>
+                <div class="switch" id="autoToggle"></div>
+            </div>
+            <p style="font-size:12px; color:#aaa; margin-top:8px;">
+                When someone says <strong>"where"</strong> → auto-reply <strong>"Cafeteria"</strong>
+            </p>
         </div>
     </div>
 
-    <!-- Overlay (Visual Feedback) -->
+    <!-- Voice Tab -->
+    <div class="section" id="voice">
+        <button class="voice-btn" id="voiceBtn">Hold to Speak</button>
+        <p style="text-align:center; font-size:14px; color:#aaa; margin:16px 0;">
+            Say: "Report", "Kill", "Emergency", "Where", "Skip", etc.
+        </p>
+    </div>
+
+    <!-- Overlay -->
     <canvas id="overlay"></canvas>
 
     <!-- Control Tab -->
-    <div class=" ribad section" id="control">
+    <div class="section" id="control">
         <div class="control-grid">
             <button class="ctrl-btn" data-action="tap" data-x="50" data-y="30">Report</button>
             <button class="ctrl-btn" data-action="tap" data-x="50" data-y="70">Use</button>
@@ -262,12 +312,9 @@
     <div class="section" id="timer">
         <div class="timer-display" id="timerDisplay">00:00</div>
         <div class="timer-controls">
-            <button class="timer-btn" id="timerStart">▶</button>
-            <button class="timer-btn" id="timerPause">⏸</button>
-            <button class="timer-btn" id="timerReset">↺</button>
-        </div>
-        <div style="margin-top:20px; text-align:center; font-size:13px; color:#777;">
-            Kill Cooldown • Emergency Timer • Sabotage
+            <button class="timer-btn" id="timerStart">Start</button>
+            <button class="timer-btn" id="timerPause">Pause</button>
+            <button class="timer-btn" id="timerReset">Reset</button>
         </div>
     </div>
 
@@ -340,9 +387,49 @@
             ctx.font = 'bold 48px system-ui';
             ctx.fillStyle = '#00ff9d';
             ctx.textAlign = 'center';
-            ctx.fillText(dir === 'up' ? '↑' : '↓', canvas.width/2, canvas.height/2);
+            ctx.fillText(dir === 'up' ? 'Up' : 'Down', canvas.width/2, canvas.height/2);
             setTimeout(() => ctx.clearRect(0, 0, canvas.width, canvas.height), 800);
         }
+
+        // === SIRI SHORTCUTS ===
+        function addSiriShortcut(action) {
+            if (window.SiriShortcuts) {
+                window.SiriShortcuts.donate({
+                    phrase: action === 'report' ? 'Report body in Medbay' :
+                            action === 'emergency' ? 'Emergency meeting!' :
+                            action === 'kill' ? 'Kill target' :
+                            action === 'vent' ? 'Vent now' :
+                            action === 'where' ? 'Where?' : 'Skip vote',
+                    userInfo: { action }
+                }).then(() => showStatus('Siri shortcut added!'))
+                 .catch(() => showStatus('Siri not available'));
+            } else {
+                showStatus('Siri Shortcuts not supported');
+            }
+        }
+
+        // === AUTO-RESPONDER (Simulated) ===
+        const autoToggle = document.getElementById('autoToggle');
+        let autoEnabled = false;
+        autoToggle.addEventListener('click', () => {
+            autoEnabled = !autoEnabled;
+            autoToggle.classList.toggle('active');
+            showStatus(autoEnabled ? 'Auto-reply ON' : 'Auto-reply OFF');
+        });
+
+        // Simulate incoming chat (demo)
+        setInterval(() => {
+            if (autoEnabled && Math.random() > 0.7) {
+                const messages = ['where', 'where?', 'where r u', 'location?'];
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                if (msg.includes('where')) {
+                    setTimeout(() => {
+                        copyToClipboard('Cafeteria');
+                        showStatus('Auto: Cafeteria');
+                    }, 800);
+                }
+            }
+        }, 3000);
 
         // === VOICE RECOGNITION ===
         const voiceBtn = document.getElementById('voiceBtn');
@@ -358,7 +445,7 @@
             if (!isListening) {
                 recognition.start();
                 voiceBtn.classList.add('listening');
-                voiceBtn.textContent = '🔴';
+                voiceBtn.textContent = 'Recording';
                 showStatus('Listening...');
                 isListening = true;
             }
@@ -366,9 +453,7 @@
 
         voiceBtn.addEventListener('touchend', e => {
             e.preventDefault();
-            if (isListening) {
-                recognition.stop();
-            }
+            if (isListening) recognition.stop();
         });
 
         recognition.onresult = event => {
@@ -378,43 +463,30 @@
 
         recognition.onend = () => {
             voiceBtn.classList.remove('listening');
-            voiceBtn.textContent = '🎤';
+            voiceBtn.textContent = 'Hold to Speak';
             isListening = false;
         };
 
         recognition.onerror = () => {
-            showStatus('Voice error — try again');
+            showStatus('Voice error');
             voiceBtn.classList.remove('listening');
-            voiceBtn.textContent = '🎤';
+            voiceBtn.textContent = 'Hold to Speak';
             isListening = false;
         };
 
-        // === Voice Commands Mapping ===
+        // === Voice Commands ===
         function handleVoiceCommand(cmd) {
             showStatus(`Heard: "${cmd}"`);
-            const lower = cmd;
-
-            // Control Actions
-            if (lower.includes('report')) { triggerControl('tap', 50, 30); }
-            else if (lower.includes('use')) { triggerControl('tap', 50, 70); }
-            else if (lower.includes('kill')) { triggerControl('tap', 20, 85); }
-            else if (lower.includes('vent')) { triggerControl('tap', 80, 85); }
-            else if (lower.includes('map')) { triggerControl('tap', 10, 10); }
-            else if (lower.includes('swipe up')) { triggerControl('swipe', null, null, 'up'); }
-            else if (lower.includes('swipe down')) { triggerControl('swipe', null, null, 'down'); }
-
-            // Chat Macros
-            else if (lower.includes('emergency')) { triggerChat('EMERGENCY MEETING!'); }
-            else if (lower.includes('where')) { triggerChat('Where?'); }
-            else if (lower.includes('sus red') || lower.includes('red sus')) { triggerChat('Red sus in Electrical'); }
-            else if (lower.includes('skip')) { triggerChat('Skip vote'); }
-            else if (lower.includes('fake task')) { triggerChat('Scanning...'); }
-
-            // Timer
-            else if (lower.includes('timer start') || lower.includes('start timer')) { document.getElementById('timerStart').click(); }
-            else if (lower.includes('pause')) { document.getElementById('timerPause').click(); }
-            else if (lower.includes('reset')) { document.getElementById('timerReset').click(); }
-
+            if (cmd.includes('report')) { triggerControl('tap', 50, 30); }
+            else if (cmd.includes('use')) { triggerControl('tap', 50, 70); }
+            else if (cmd.includes('kill')) { triggerControl('tap', 20, 85); }
+            else if (cmd.includes('vent')) { triggerControl('tap', 80, 85); }
+            else if (cmd.includes('emergency')) { triggerChat('EMERGENCY MEETING!'); }
+            else if (cmd.includes('where')) { triggerChat('Cafeteria'); }
+            else if (cmd.includes('sus red') || cmd.includes('red sus')) { triggerChat('Red sus in Electrical'); }
+            else if (cmd.includes('skip')) { triggerChat('Skip vote'); }
+            else if (cmd.includes('fake task')) { triggerChat('Scanning...'); }
+            else if (cmd.includes('timer start')) { document.getElementById('timerStart').click(); }
             else { showStatus('Unknown command'); }
         }
 
@@ -431,7 +503,7 @@
             showStatus(`Said: ${final.substring(0,25)}...`);
         }
 
-        // === Control Actions ===
+        // === Other Features (Control, Chat, Tasks, Timer) ===
         document.querySelectorAll('.ctrl-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const action = btn.dataset.action;
@@ -445,16 +517,10 @@
             btn.addEventListener('touchstart', ripple, {passive:true});
         });
 
-        // === Joystick ===
         const joy = document.getElementById('joystick');
         const stick = document.getElementById('stick');
         let joyActive = false;
-
-        joy.addEventListener('touchstart', e => {
-            joyActive = true;
-            e.preventDefault();
-        }, {passive:false});
-
+        joy.addEventListener('touchstart', e => { joyActive = true; e.preventDefault(); }, {passive:false});
         joy.addEventListener('touchmove', e => {
             if (!joyActive) return;
             const touch = e.touches[0];
@@ -466,30 +532,17 @@
             stick.style.transform = `translate(${dist * Math.cos(angle)}px, ${dist * Math.sin(angle)}px)`;
             e.preventDefault();
         }, {passive:false});
-
         joy.addEventListener('touchend', () => {
             joyActive = false;
             stick.style.transform = 'translate(-50%, -50%)';
         });
 
-        // === Overlay Toggle ===
         document.getElementById('toggleOverlay').addEventListener('click', () => {
             overlayActive = !overlayActive;
             canvas.classList.toggle('active');
             showStatus(overlayActive ? 'Overlay ON' : 'Overlay OFF');
         });
 
-        // === Tabs ===
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-            });
-        });
-
-        // === CHAT TAB ===
         let selectedColor = 'White';
         document.querySelectorAll('.color-swatch').forEach(swatch => {
             swatch.addEventListener('click', () => {
@@ -522,7 +575,6 @@
             }
         });
 
-        // === TASKS ===
         document.querySelectorAll('.task-checkbox').forEach(cb => {
             cb.addEventListener('click', () => {
                 cb.classList.toggle('checked');
@@ -538,7 +590,6 @@
             showStatus('Faked all tasks!');
         });
 
-        // === TIMER ===
         let timerInterval, seconds = 0;
         const display = document.getElementById('timerDisplay');
 
@@ -572,7 +623,17 @@
             showStatus('Timer reset');
         });
 
-        // === iOS ===
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // iOS
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         if (isIOS && !window.navigator.standalone) {
             setTimeout(() => {
@@ -583,11 +644,10 @@
             }, 2500);
         }
 
-        let lastTouch = 0;
         document.addEventListener('touchend', e => {
             const now = Date.now();
-            if (now - lastTouch <= 300) e.preventDefault();
-            lastTouch = now;
+            if (now - (window.lastTouch || 0) <= 300) e.preventDefault();
+            window.lastTouch = now;
         }, {passive:false});
 
         document.querySelectorAll('button').forEach(b => {
